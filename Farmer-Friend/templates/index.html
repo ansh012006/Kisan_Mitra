@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ translations.app_name }} - {{ translations.tagline }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-seedling"></i>
+            <span id="app-name">{{ translations.app_name }}</span>
+        </div>
+        <div class="nav-links">
+            <a href="#home" class="nav-link active" data-section="home">
+                <i class="fas fa-home"></i>
+                <span data-translate="home">{{ translations.home }}</span>
+            </a>
+            <a href="#disease" class="nav-link" data-section="disease">
+                <i class="fas fa-leaf"></i>
+                <span data-translate="disease_prediction">{{ translations.disease_prediction }}</span>
+            </a>
+            <a href="#mandi" class="nav-link" data-section="mandi">
+                <i class="fas fa-store"></i>
+                <span data-translate="mandi_rates">{{ translations.mandi_rates }}</span>
+            </a>
+            <a href="#schemes" class="nav-link" data-section="schemes">
+                <i class="fas fa-file-alt"></i>
+                <span data-translate="government_schemes">{{ translations.government_schemes }}</span>
+            </a>
+            <a href="#fertilizers" class="nav-link" data-section="fertilizers">
+                <i class="fas fa-flask"></i>
+                <span data-translate="fertilizers">{{ translations.fertilizers }}</span>
+            </a>
+        </div>
+        <div class="nav-actions">
+            <button class="voice-btn" id="voice-toggle" title="{{ translations.voice_assistant }}">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <div class="language-selector">
+                <select id="language-select">
+                    {% for code, name in languages.items() %}
+                    <option value="{{ code }}" {% if code == current_lang %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <button class="mobile-menu-btn" id="mobile-menu">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+
+    <main class="main-content">
+        <section id="home" class="section active">
+            <div class="hero">
+                <div class="hero-content">
+                    <h1><span class="highlight">{{ translations.app_name }}</span></h1>
+                    <p class="tagline">{{ translations.tagline }}</p>
+                    <p class="hero-description" id="welcome-text">{{ translations.welcome_message }}</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" onclick="navigateTo('disease')">
+                            <i class="fas fa-leaf"></i>
+                            <span data-translate="disease_prediction">{{ translations.disease_prediction }}</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="navigateTo('mandi')">
+                            <i class="fas fa-store"></i>
+                            <span data-translate="mandi_rates">{{ translations.mandi_rates }}</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="hero-illustration">
+                        <i class="fas fa-tractor"></i>
+                        <i class="fas fa-cloud-sun"></i>
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card" onclick="navigateTo('disease')">
+                    <div class="feature-icon">
+                        <i class="fas fa-microscope"></i>
+                    </div>
+                    <h3 data-translate="disease_prediction">{{ translations.disease_prediction }}</h3>
+                    <p>AI-powered crop disease detection with treatment recommendations</p>
+                </div>
+                <div class="feature-card" onclick="navigateTo('mandi')">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 data-translate="mandi_rates">{{ translations.mandi_rates }}</h3>
+                    <p>Live market prices from mandis across India</p>
+                </div>
+                <div class="feature-card" onclick="navigateTo('schemes')">
+                    <div class="feature-icon">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                    <h3 data-translate="government_schemes">{{ translations.government_schemes }}</h3>
+                    <p>Government schemes and subsidies for farmers</p>
+                </div>
+                <div class="feature-card" onclick="navigateTo('fertilizers')">
+                    <div class="feature-icon">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <h3 data-translate="fertilizers">{{ translations.fertilizers }}</h3>
+                    <p>Fertilizer and pesticide prices with usage guide</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="disease" class="section">
+            <h2 class="section-title">
+                <i class="fas fa-leaf"></i>
+                <span data-translate="disease_prediction">{{ translations.disease_prediction }}</span>
+            </h2>
+            
+            <div class="disease-container">
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-box" id="upload-box">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p data-translate="upload_prompt">{{ translations.upload_prompt }}</p>
+                        <p class="upload-formats" data-translate="supported_formats">{{ translations.supported_formats }}</p>
+                        <input type="file" id="image-input" accept="image/*" hidden>
+                    </div>
+                    <div class="image-preview" id="image-preview" style="display: none;">
+                        <img id="preview-image" src="" alt="Crop image">
+                        <button class="btn btn-small" id="change-image">
+                            <i class="fas fa-sync-alt"></i> Change
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="crop-selector">
+                    <label for="crop-type" data-translate="select_crop">{{ translations.select_crop }}</label>
+                    <select id="crop-type">
+                        <option value="wheat" data-translate="wheat">{{ translations.wheat }}</option>
+                        <option value="rice" data-translate="rice">{{ translations.rice }}</option>
+                        <option value="tomato" data-translate="tomato">{{ translations.tomato }}</option>
+                        <option value="potato" data-translate="potato">{{ translations.potato }}</option>
+                        <option value="corn" data-translate="corn">{{ translations.corn }}</option>
+                        <option value="cotton" data-translate="cotton">{{ translations.cotton }}</option>
+                        <option value="sugarcane" data-translate="sugarcane">{{ translations.sugarcane }}</option>
+                    </select>
+                </div>
+                
+                <button class="btn btn-primary btn-large" id="analyze-btn" disabled>
+                    <i class="fas fa-search"></i>
+                    <span data-translate="analyze">{{ translations.analyze }}</span>
+                </button>
+                
+                <div class="results-area" id="results-area" style="display: none;">
+                    <h3 data-translate="results">{{ translations.results }}</h3>
+                    <div class="result-card" id="result-card">
+                        <div class="result-header">
+                            <div class="disease-status" id="disease-status">
+                                <i class="fas fa-check-circle"></i>
+                                <span id="status-text">Healthy</span>
+                            </div>
+                            <div class="confidence-badge" id="confidence-badge">
+                                <span id="confidence-value">95%</span>
+                                <span data-translate="confidence">{{ translations.confidence }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="result-details" id="result-details">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="mandi" class="section">
+            <h2 class="section-title">
+                <i class="fas fa-store"></i>
+                <span data-translate="mandi_rates">{{ translations.mandi_rates }}</span>
+            </h2>
+            
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label data-translate="state">{{ translations.state }}</label>
+                    <select id="state-filter">
+                        <option value="" data-translate="all_states">All States</option>
+                        <option value="Punjab">Punjab</option>
+                        <option value="Haryana">Haryana</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Gujarat">Gujarat</option>
+                        <option value="Rajasthan">Rajasthan</option>
+                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label data-translate="commodity">{{ translations.commodity }}</label>
+                    <select id="commodity-filter">
+                        <option value="" data-translate="all_commodities">All Commodities</option>
+                        <option value="Wheat">Wheat</option>
+                        <option value="Rice">Rice</option>
+                        <option value="Onion">Onion</option>
+                        <option value="Potato">Potato</option>
+                        <option value="Tomato">Tomato</option>
+                        <option value="Soybean">Soybean</option>
+                        <option value="Cotton">Cotton</option>
+                        <option value="Groundnut">Groundnut</option>
+                        <option value="Mustard">Mustard</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" id="search-mandi">
+                    <i class="fas fa-search"></i>
+                    <span data-translate="search">{{ translations.search }}</span>
+                </button>
+            </div>
+            
+            <div class="data-table-container">
+                <table class="data-table" id="mandi-table">
+                    <thead>
+                        <tr>
+                            <th data-translate="state">{{ translations.state }}</th>
+                            <th data-translate="market">{{ translations.market }}</th>
+                            <th data-translate="commodity">{{ translations.commodity }}</th>
+                            <th data-translate="min_price">{{ translations.min_price }}</th>
+                            <th data-translate="max_price">{{ translations.max_price }}</th>
+                            <th data-translate="modal_price">{{ translations.modal_price }}</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mandi-tbody">
+                    </tbody>
+                </table>
+                <div class="loading-spinner" id="mandi-loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span data-translate="loading">{{ translations.loading }}</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="schemes" class="section">
+            <h2 class="section-title">
+                <i class="fas fa-file-alt"></i>
+                <span data-translate="government_schemes">{{ translations.government_schemes }}</span>
+            </h2>
+            
+            <div class="schemes-grid" id="schemes-grid">
+            </div>
+            <div class="loading-spinner" id="schemes-loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span data-translate="loading">{{ translations.loading }}</span>
+            </div>
+        </section>
+
+        <section id="fertilizers" class="section">
+            <h2 class="section-title">
+                <i class="fas fa-flask"></i>
+                <span data-translate="fertilizers">{{ translations.fertilizers }}</span>
+            </h2>
+            
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="fertilizer">
+                    <i class="fas fa-leaf"></i>
+                    <span data-translate="fertilizers_tab">Fertilizers</span>
+                </button>
+                <button class="tab-btn" data-tab="pesticide">
+                    <i class="fas fa-bug"></i>
+                    <span data-translate="pesticides">Pesticides</span>
+                </button>
+            </div>
+            
+            <div class="data-table-container">
+                <table class="data-table" id="fertilizer-table">
+                    <thead>
+                        <tr>
+                            <th data-translate="fertilizer_name">{{ translations.fertilizer_name }}</th>
+                            <th data-translate="category">{{ translations.category }}</th>
+                            <th>Brand</th>
+                            <th>Quantity</th>
+                            <th data-translate="price">{{ translations.price }}</th>
+                            <th data-translate="usage">{{ translations.usage }}</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fertilizer-tbody">
+                    </tbody>
+                </table>
+                <div class="loading-spinner" id="fertilizer-loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span data-translate="loading">{{ translations.loading }}</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="voice-panel" id="voice-panel">
+        <div class="voice-panel-content">
+            <div class="voice-indicator" id="voice-indicator">
+                <div class="voice-waves">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <p class="voice-status" id="voice-status" data-translate="voice_help">{{ translations.voice_help }}</p>
+            <div class="voice-buttons">
+                <button class="btn btn-voice" id="start-listening">
+                    <i class="fas fa-microphone"></i>
+                    <span data-translate="speak">{{ translations.speak }}</span>
+                </button>
+                <button class="btn btn-voice" id="stop-speaking">
+                    <i class="fas fa-volume-mute"></i>
+                    <span data-translate="stop">{{ translations.stop }}</span>
+                </button>
+            </div>
+            <button class="voice-close" id="voice-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="tts-controls" id="tts-controls">
+        <button class="tts-btn" id="read-aloud" title="Read content aloud">
+            <i class="fas fa-volume-up"></i>
+        </button>
+    </div>
+
+    <footer class="footer">
+        <p data-translate="footer_text">{{ translations.footer_text }}</p>
+        <p>&copy; 2024 {{ translations.app_name }}</p>
+    </footer>
+
+    <script>
+        window.currentLang = '{{ current_lang }}';
+        window.translations = {{ translations|tojson|safe }};
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
